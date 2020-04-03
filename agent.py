@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import pika
 import sys
 
@@ -35,7 +36,7 @@ class Agent():
         self.__queue = value
 
 
-    def produce_message(self, message):
+    def produceFanout(self, message):
         #establish a connection with RabbitMQ server
         connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
         channel = connection.channel()
@@ -52,7 +53,7 @@ class Agent():
         #finish the connection with RabbitMQ server
         connection.close()
 
-    def consumer_message(self):
+    def consumeFanout(self):
         #establish a connection with RabbitMQ server
         connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
         channel = connection.channel()
@@ -76,6 +77,33 @@ class Agent():
         print('\n Waiting for messages. To exit press CTRL+C \n')
         channel.start_consuming()
 
+    def produceDirect(self, message):
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=self.__host))
+        channel = connection.channel()
+
+        channel.queue_declare(queue='Doc_Manage')
+
+        channel.basic_publish(exchange='Orders', routing_key='Felix', body=message)
+        print(" [x] Sent " + str(message))
+        connection.close()
+    def consumeDirect(self):
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=self.__host))
+        channel = connection.channel()
+
+        channel.queue_declare(queue='Doc_Manage')
+
+
+        def callback(ch, method, properties, body):
+            print(" [x] Received %r" % body)
+
+
+        channel.basic_consume(
+            queue='Doc_Manage', on_message_callback=callback, auto_ack=True)
+
+        print(' [*] Waiting for messages. To exit press CTRL+C')
+        channel.start_consuming()
     def run(self):
         while True:
             opt = input('(1) producer, (2) consumer, (other) quit  -->')
@@ -89,5 +117,5 @@ class Agent():
             else:
                 sys.exit()
 
-
-agent1 = Agent(host = '192.168.0.5', port = 5672, queue_name = 'classroom_ToPI')
+if __name__ == "__main__":
+    agent1 = Agent(host = '192.168.0.5', port = 5672, queue_name = 'classroom_ToPI')
