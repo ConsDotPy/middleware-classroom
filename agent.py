@@ -9,8 +9,6 @@ class Agent():
         self.__port = port
         self.__queue = queue_name
 
-        self.run()
-
     @property
     def host(self):
         return self.__host
@@ -38,15 +36,15 @@ class Agent():
 
     def produceFanout(self, message):
         #establish a connection with RabbitMQ server
-        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host), self.__port, '/')
         channel = connection.channel()
 
         #define the exchange
-        channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'fanout)
+        channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'fanout')
 
         #send message through the declared exchange and the routing_key (delivery_mode make message persistent)
-        props = pika.BasicProperties(headers= {'status': 'Tomando Lista:',"alarm":"LISTA"},type ="RFID Sensor",delivery_mode = 2)
-        channel.basic_publish(exchange = 'classroom_logs', routing_key = 'attendance', body = message, properties = props)
+        props = pika.BasicProperties(headers= {'status': 'Tomando Lista:',"alarm":"LISTA"},type ="RFID Sensor")
+        channel.basic_publish(exchange = 'classroom_logs', routing_key = '', body = message, properties = props)
 
         print("[x] Sent %r \n" %message)
 
@@ -64,7 +62,7 @@ class Agent():
         #define the classroom_queue to receive the message
         result = channel.queue_declare(queue = '', exclusive = True) #
 
-        channel.queue_bind(exchange = 'classroom_logs', queue = result.method.queue, routing_key = 'attendance')
+        channel.queue_bind(exchange = 'classroom_logs', queue = result.method.queue)
 
         #In this function we make the work with received information
         def callback(ch, method, properties, body):
@@ -79,7 +77,7 @@ class Agent():
 
     def produceDirect(self, message):
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=self.__host))
+            pika.ConnectionParameters(host="192.168.0.20",5672)
         channel = connection.channel()
 
         channel.queue_declare(queue='Doc_Manage')
@@ -87,9 +85,10 @@ class Agent():
         channel.basic_publish(exchange='Orders', routing_key='Felix', body=message)
         print(" [x] Sent " + str(message))
         connection.close()
+
     def consumeDirect(self):
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=self.__host))
+            pika.ConnectionParameters(host="192.168.0.20"),5672)
         channel = connection.channel()
 
         channel.queue_declare(queue='Doc_Manage')
