@@ -37,7 +37,7 @@ class Agent():
 
     def produce_message(self, message):
         #establish a connection with RabbitMQ server
-        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host,self.__port, '/'))
         channel = connection.channel()
 
         #create a classroom_queue queue to which the message will be delivered and received
@@ -57,7 +57,7 @@ class Agent():
 
     def consumer_message(self):
         #establish a connection with RabbitMQ server
-        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host,self.__port, '/'))
         channel = connection.channel()
 
         #define the exchange
