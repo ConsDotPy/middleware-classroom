@@ -76,8 +76,7 @@ class Agent():
         channel.start_consuming()
 
     def produceDirect(self, message):
-        connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host="192.168.0.20",5672)
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.20"))
         channel = connection.channel()
 
         channel.queue_declare(queue='Doc_Manage')
@@ -88,7 +87,7 @@ class Agent():
 
     def consumeDirect(self):
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host="192.168.0.20"),5672)
+            pika.ConnectionParameters(host="192.168.0.20"))
         channel = connection.channel()
 
         channel.queue_declare(queue='Doc_Manage')
