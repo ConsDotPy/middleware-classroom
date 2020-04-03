@@ -36,7 +36,7 @@ class Agent():
 
     def produceFanout(self, message):
         #establish a connection with RabbitMQ server
-        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host), self.__port, '/')
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.5"))
         channel = connection.channel()
 
         #define the exchange
@@ -53,7 +53,7 @@ class Agent():
 
     def consumeFanout(self):
         #establish a connection with RabbitMQ server
-        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.5"))
         channel = connection.channel()
 
         #define the exchange
