@@ -72,8 +72,7 @@ class Agent():
         channel.basic_consume(queue = result.method.queue, on_message_callback = callback, auto_ack = True)
 
         #consume a message
-        print('\n Waiting for messages. To exit press CTRL+C \n')
-        channel.start_consuming()
+        channel.basic_get(queue = result.method.queue, auto_ack = True)
 
     def produceDirect(self, message):
         user = "RaspPi"
@@ -105,8 +104,7 @@ class Agent():
         channel.basic_consume(
             queue='Doc_Manage', on_message_callback=callback, auto_ack=True)
 
-        print(' [*] Waiting for messages. To exit press CTRL+C')
-        channel.start_consuming()
+        return channel.basic_get(queue='Doc_Manage',auto_ack=True)
     def run(self):
         while True:
             opt = input('(1) producer, (2) consumer, (other) quit  -->')
