@@ -3,14 +3,14 @@ import sys
 
 class Agent():
 
-    def __init__(self, host = 'localhost', port = 5672, queue_name = 'classroom_queue'):        
+    def __init__(self, host = 'localhost', port = 5672, queue_name = 'classroom_queue'):
         self.__host = host
         self.__port = port
         self.__queue = queue_name
 
         self.run()
-    
-    @property    
+
+    @property
     def host(self):
         return self.__host
 
@@ -18,7 +18,7 @@ class Agent():
     def host(self, value):
         self.__host = value
 
-    @property    
+    @property
     def port(self):
         return self.__port
 
@@ -26,34 +26,35 @@ class Agent():
     def port(self, value):
         self.__port = value
 
-    @property    
+    @property
     def queue(self):
         return self.__queue
 
     @queue.setter
     def queue(self, value):
-        self.__queue = value    
-    
-    
+        self.__queue = value
+
+
     def produce_message(self, message):
         #establish a connection with RabbitMQ server
         connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
         channel = connection.channel()
 
         #create a classroom_queue queue to which the message will be delivered and received
-        #channel.queue_declare(queue = self.__queue)
+        channel.queue_declare(queue = self.__queue, durable = True)
 
         #define the exchange
         channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'direct')
 
         #send message through the declared exchange and the routing_key (delivery_mode make message persistent)
+        props = pika.BasicProperties(headers= {'status': 'Good Quality',"alarm":"LISTA"},type ="RFID Sensor")
         channel.basic_publish(exchange = 'classroom_logs', routing_key = 'attendance', body = message, properties = pika.BasicProperties(delivery_mode = 2))
 
         print("[x] Sent %r \n" %message)
 
         #finish the connection with RabbitMQ server
-        connection.close()        
-    
+        connection.close()
+
     def consumer_message(self):
         #establish a connection with RabbitMQ server
         connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
@@ -63,7 +64,7 @@ class Agent():
         channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'direct')
 
         #define the classroom_queue to receive the message
-        result = channel.queue_declare(queue = '', exclusive = True, durable = True) #
+        result = channel.queue_declare(queue = 'classroom_queue', exclusive = True, durable = True) #
 
         channel.queue_bind(exchange = 'classroom_logs', queue = result.method.queue, routing_key = 'attendance')
 
@@ -76,7 +77,7 @@ class Agent():
 
         #consume a message
         print('\n Waiting for messages. To exit press CTRL+C \n')
-        channel.start_consuming()    
+        channel.start_consuming()
 
     def run(self):
         while True:
@@ -88,8 +89,8 @@ class Agent():
                     print('\n message sended!! \n')
                 else:
                     self.consumer_message()
-            else:                
+            else:
                 sys.exit()
 
 
-agent = Agent(host = '192.168.0.5', port = 5672)
+agent = Agent(host = '192.168.0.5', port = 5672, queue_name = 'classroom_queue')
