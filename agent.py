@@ -37,7 +37,7 @@ class Agent():
 
     def produce_message(self, message):
         #establish a connection with RabbitMQ server
-        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host,self.__port, '/'))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host,self.__port))
         channel = connection.channel()
 
         #create a classroom_queue queue to which the message will be delivered and received
@@ -64,7 +64,7 @@ class Agent():
         channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'direct')
 
         #define the classroom_queue to receive the message
-        result = channel.queue_declare(queue = 'classroom_queue', exclusive = True, durable = True) #
+        result = channel.queue_declare(queue = 'classroom_ToPC', exclusive = True, durable = True) #
 
         channel.queue_bind(exchange = 'classroom_logs', queue = result.method.queue, routing_key = 'attendance')
 
@@ -93,4 +93,4 @@ class Agent():
                 sys.exit()
 
 
-agent = Agent(host = '192.168.0.5', port = 5672, queue_name = 'classroom_queue')
+agent1 = Agent(host = '192.168.0.5', port = 5672, queue_name = 'classroom_ToPI')
