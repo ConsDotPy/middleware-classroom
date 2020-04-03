@@ -82,9 +82,9 @@ class Agent():
         connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.20",credentials=credentials))
         channel = connection.channel()
 
-        channel.queue_declare(queue='Doc_Manage')
+        channel.queue_declare(queue='Doc_Manage',durable=True)
 
-        channel.basic_publish(exchange='Orders', routing_key='Felix', body=message)
+        channel.basic_publish(exchange='', routing_key='Doc_Manage', body=message)
         print(" [x] Sent " + str(message))
         connection.close()
 
@@ -95,7 +95,7 @@ class Agent():
         connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.20",credentials=credentials))
         channel = connection.channel()
 
-        channel.queue_declare(queue='Doc_Manage')
+        channel.queue_declare(queue='Doc_Manage',durable=True)
 
 
         def callback(ch, method, properties, body):
