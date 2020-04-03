@@ -78,7 +78,8 @@ class Agent():
     def produceDirect(self, message):
         user = "RaspPi"
         pwd = "Tangente123"
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.20",5672,'/',credentials))
+        credentials = pika.PlainCredentials(user, pwd)
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.20",credentials=credentials))
         channel = connection.channel()
 
         channel.queue_declare(queue='Doc_Manage')
@@ -90,7 +91,8 @@ class Agent():
     def consumeDirect(self):
         user = "RaspPi"
         pwd = "Tangente123"
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.20",5672,'/',credentials))
+        credentials = pika.PlainCredentials(user, pwd)
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.20",credentials=credentials))
         channel = connection.channel()
 
         channel.queue_declare(queue='Doc_Manage')
