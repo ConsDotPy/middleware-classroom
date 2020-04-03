@@ -37,18 +37,15 @@ class Agent():
 
     def produce_message(self, message):
         #establish a connection with RabbitMQ server
-        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host,self.__port))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
         channel = connection.channel()
 
-        #create a classroom_queue queue to which the message will be delivered and received
-        channel.queue_declare(queue = self.__queue, durable = True)
-
         #define the exchange
-        channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'direct')
+        channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'fanout)
 
         #send message through the declared exchange and the routing_key (delivery_mode make message persistent)
-        props = pika.BasicProperties(headers= {'status': 'Good Quality',"alarm":"LISTA"},type ="RFID Sensor")
-        channel.basic_publish(exchange = 'classroom_logs', routing_key = 'attendance', body = message, properties = pika.BasicProperties(delivery_mode = 2))
+        props = pika.BasicProperties(headers= {'status': 'Tomando Lista:',"alarm":"LISTA"},type ="RFID Sensor",delivery_mode = 2)
+        channel.basic_publish(exchange = 'classroom_logs', routing_key = 'attendance', body = message, properties = props)
 
         print("[x] Sent %r \n" %message)
 
@@ -57,14 +54,14 @@ class Agent():
 
     def consumer_message(self):
         #establish a connection with RabbitMQ server
-        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host,self.__port, '/'))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(self.__host))
         channel = connection.channel()
 
         #define the exchange
-        channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'direct')
+        channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'fanout')
 
         #define the classroom_queue to receive the message
-        result = channel.queue_declare(queue = 'classroom_ToPC', exclusive = True, durable = True) #
+        result = channel.queue_declare(queue = '', exclusive = True) #
 
         channel.queue_bind(exchange = 'classroom_logs', queue = result.method.queue, routing_key = 'attendance')
 
