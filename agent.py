@@ -3,7 +3,7 @@ import sys
 
 class Agent():
 
-    def __init__(self, host = '192.168.0.5', port = 5672, queue_name = 'classroom_queue'):        
+    def __init__(self, host = 'localhost', port = 5672, queue_name = 'classroom_queue'):        
         self.__host = host
         self.__port = port
         self.__queue = queue_name
@@ -92,4 +92,4 @@ class Agent():
                 sys.exit()
 
 
-agent = Agent('127.0.1.1')
+agent = Agent(host = '192.168.0.5', port = 5672)
