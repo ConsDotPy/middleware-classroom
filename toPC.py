@@ -13,7 +13,6 @@ while True:
         ToValidate = [space != None for space in ToList]
         if all(ToValidate):
             dec = ToList[2].decode("utf-8")
-            print()
             toDB = dec.split(" ")
             atte = dt.timestamp(dt.now())
             db.insert({'ID': str(toDB[0]), 'Nombre': str(toDB[1] + " " + toDB[2]), 'Fecha': str(atte)})
