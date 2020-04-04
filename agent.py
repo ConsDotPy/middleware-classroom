@@ -51,7 +51,7 @@ class Agent():
         #finish the connection with RabbitMQ server
         connection.close()
 
-    def consumeFanout(self):
+    def getNameFanout(self):
         #establish a connection with RabbitMQ server
         connection = pika.BlockingConnection(pika.ConnectionParameters(host="192.168.0.5"))
         channel = connection.channel()
@@ -60,19 +60,20 @@ class Agent():
         channel.exchange_declare(exchange = 'classroom_logs', exchange_type = 'fanout')
 
         #define the classroom_queue to receive the message
-        result = channel.queue_declare(queue = '', exclusive = True) #
-
-        channel.queue_bind(exchange = 'classroom_logs', queue = result.method.queue)
+        result = channel.queue_declare(queue = '', exclusive = True)
+        return result.method.queue, channel#
+    def consumeFanout(self, name, channel):
+        channel.queue_bind(exchange = 'classroom_logs', queue = name)
 
         #In this function we make the work with received information
         def callback(ch, method, properties, body):
             print('[x] Received %r' %body)
 
         #prepare to consume message
-        channel.basic_consume(queue = result.method.queue, on_message_callback = callback, auto_ack = True)
+        #channel.basic_consume(queue = name, on_message_callback = callback, auto_ack = True)
 
         #consume a message
-        channel.basic_get(queue = result.method.queue, auto_ack = True)
+        return channel.basic_get(queue = name, auto_ack = True)
 
     def produceDirect(self, message):
         user = "RaspPi"

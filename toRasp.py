@@ -5,4 +5,4 @@ from time import sleep
 piClass = Agent()
 while True:
     id, name = ReadRFID()
-    classPi.produceFanout(str(id) + " " + str(name))
+    piClass.produceFanout(id + " " + name)
